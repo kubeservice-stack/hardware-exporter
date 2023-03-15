@@ -1,2 +1,2 @@
-# hardware_exporter
+# hardware-exporter
 hardware metrics exporter
