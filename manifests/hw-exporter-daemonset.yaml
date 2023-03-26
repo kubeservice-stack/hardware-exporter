@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: hw-exporter
+    app.kubernetes.io/part-of: kube-prometheus
+    app.kubernetes.io/version: v2.1.0
+  name: hw-exporter
+  namespace: monitoring
+spec:
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: hw-exporter
+      app.kubernetes.io/part-of: kube-prometheus
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: exporter
+        app.kubernetes.io/name: hw-exporter
+        app.kubernetes.io/part-of: kube-prometheus
+        app.kubernetes.io/version: v2.1.0
+    spec:
+      containers:
+        - args:
+            - --web.listen-address=:9696
+          image: registry.eki/eki-plus/hw-exporter:v2.1.7
+          imagePullPolicy: IfNotPresent
+          name: hw-exporter
+          ports:
+            - containerPort: 9696
+              hostPort: 9696
+              name: hw-metrics
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 250m
+              memory: 180Mi
+            requests:
+              cpu: 102m
+              memory: 180Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /host/sys
+              mountPropagation: HostToContainer
+              name: sys
+              readOnly: true
+            - mountPath: /host/root
+              mountPropagation: HostToContainer
+              name: root
+              readOnly: true
+            - mountPath: /etc/config
+              name: serverconfigmap
+      dnsPolicy: ClusterFirst
+      hostNetwork: true
+      hostPID: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: hw-exporter
+      terminationGracePeriodSeconds: 30
+      tolerations:
+        - operator: Exists
+      volumes:
+        - hostPath:
+            path: /sys
+            type: ""
+          name: sys
+        - hostPath:
+            path: /
+            type: ""
+          name: root
+        - configMap:
+            defaultMode: 420
+            name: hw-exporter-config
+          name: serverconfigmap
+  updateStrategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 10%
+    type: RollingUpdate

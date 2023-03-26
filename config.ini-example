@@ -1,0 +1,2 @@
+[servers]
+<server os name >=<bmc ip address>@hardware@<bmc username>@hardware@<bmc password>
