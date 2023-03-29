@@ -204,16 +204,19 @@ type NetworkAdapter struct {
 	resetSettingsToDefaultTarget string
 	Oem                          NetworkAdapterOem `json:"oem"`
 }
+
 type NetworkAdapterOem struct {
-	Public NetworkAdapterPublic `json:"public",omitempty`
-	HuaWei NetworkAdapterHuaWei `json:"huawei",omitempty`
-	H3C    NetworkAdapterH3C    `json:"h3c",omitempty`
+	Public NetworkAdapterInfo `json:"public",omitempty`
+	H3c    NetworkAdapterInfo `json:"h3c",omitempty`
+	Huawei NetworkAdapterInfo `json:"huawei",omitempty`
 }
 
-type NetworkAdapterPublic struct {
-	CardModel  string
-	CardType   string
-	SlotNumber int
+type NetworkAdapterInfo struct {
+	CardModel          string      `json:"cardModel"`
+	CardType           string      `json:"cardType"`
+	SlotNumber         interface{} `json:"slotNumber"`
+	AssociatedResource string      `json:"associatedResource"`
+	BoardIdHex         string      `json:"boardIdHex"`
 }
 
 // UnmarshalJSON unmarshals a NetworkAdapter object from the raw JSON.

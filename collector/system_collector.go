@@ -1,9 +1,9 @@
 package collector
 
 import (
+	"fmt"
 	"hardware_exporter/lib/gofish"
 	redfish2 "hardware_exporter/lib/gofish/redfish"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -389,9 +389,19 @@ func parsePorcessor(ch chan<- prometheus.Metric, assetTag string, serialNumber s
 	processorState := processor.Status.State
 	processorHealthStatus := processor.Status.Health
 	processorManufacturer := processor.Manufacturer
-	processorMaxSpeedMHz := strconv.FormatFloat(float64(processor.MaxSpeedMHz), 'G', 5, 32)
 	processorProcessorArchitecture := string(processor.ProcessorArchitecture)
-	processorSerialNumber := processor.Oem.Public.SerialNumber
+
+	processorMaxSpeedMHz := fmt.Sprintf("%vMhz", processor.MaxSpeedMHz)
+
+	var processorSerialNumber string
+	if processor.Oem.H3C.SerialNumber != "" {
+		processorSerialNumber = processor.Oem.H3C.SerialNumber
+	} else if processor.Oem.Huawei.SerialNumber != "" {
+		processorSerialNumber = processor.Oem.Huawei.SerialNumber
+	} else {
+		processorSerialNumber = processor.Oem.Public.SerialNumber
+	}
+
 	systemProcessorLabelValues := []string{assetTag, serialNumber, processorID, processorManufacturer, processorModel, processorSerialNumber, processorMaxSpeedMHz, processorProcessorArchitecture, "Processor"}
 
 	if processorStateValue, ok := parseCommonStatusState(processorState); ok {

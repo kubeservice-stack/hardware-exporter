@@ -203,16 +203,18 @@ type NetworkPort struct {
 	Oem     netWorkPortOem `json:"oem"`
 }
 type netWorkPortOem struct {
-	Public netWorkPortPublic
+	Public netWorkPortInfo `json:"Public",omitempty`
+	H3c    netWorkPortInfo `json:"H3C",omitempty`
+	Huawei netWorkPortInfo `json:"Huawei",omitempty`
 }
 
-type netWorkPortPublic struct {
-	CurrentSpeed           string
-	DriverVersion          string
-	FirmwarePackageVersion string
-	PortMaxSpeed           string
-	PortType               string
-	SupportSpeed           string
+type netWorkPortInfo struct {
+	CurrentSpeed           string `json:"CurrentSpeed"`
+	DriverVersion          string `json:"DriverVersion"`
+	FirmwarePackageVersion string `json:"FirmwarePackageVersion"`
+	PortMaxSpeed           string `json:"PortMaxSpeed"`
+	PortType               string `json:"PortType"`
+	SupportSpeed           string `json:"SupportSpeed"`
 }
 
 // UnmarshalJSON unmarshals a NetworkPort object from the raw JSON.
