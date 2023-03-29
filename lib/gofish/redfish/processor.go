@@ -291,7 +291,7 @@ type Processor struct {
 	Manufacturer string
 	// MaxSpeedMHz shall indicate the maximum rated clock
 	// speed of the processor in MHz.
-	MaxSpeedMHz float32
+	MaxSpeedMHz interface{}
 	// MaxTDPWatts shall be the maximum Thermal
 	// Design Power (TDP) in watts.
 	MaxTDPWatts int
@@ -370,10 +370,12 @@ type Processor struct {
 
 // ProcessorOem shall contain identification information for a processor.
 type ProcessorOem struct {
-	Public ProcessorPublic `json:"public"`
+	Public ProcessorInfo `json:"public",omitempty"`
+	H3C    ProcessorInfo `json:"h3c",omitempty"`
+	Huawei ProcessorInfo `json:"huawei",omitempty"`
 }
 
-type ProcessorPublic struct {
+type ProcessorInfo struct {
 	SerialNumber string
 }
 

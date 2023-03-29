@@ -1,9 +1,9 @@
 package collector
 
 import (
+	"fmt"
 	"hardware_exporter/lib/gofish"
-	redfish2 "hardware_exporter/lib/gofish/redfish"
-	"strconv"
+	redfish "hardware_exporter/lib/gofish/redfish"
 	"strings"
 	"sync"
 
@@ -380,7 +380,7 @@ func (s *SystemCollector) Collect(ch chan<- prometheus.Metric) {
 
 }
 
-func parsePorcessor(ch chan<- prometheus.Metric, assetTag string, serialNumber string, processor *redfish2.Processor, wg *sync.WaitGroup) {
+func parsePorcessor(ch chan<- prometheus.Metric, assetTag string, serialNumber string, processor *redfish.Processor, wg *sync.WaitGroup) {
 	defer wg.Done()
 	processorID := processor.ID
 	processorModel := processor.Model
@@ -389,9 +389,19 @@ func parsePorcessor(ch chan<- prometheus.Metric, assetTag string, serialNumber s
 	processorState := processor.Status.State
 	processorHealthStatus := processor.Status.Health
 	processorManufacturer := processor.Manufacturer
-	processorMaxSpeedMHz := strconv.FormatFloat(float64(processor.MaxSpeedMHz), 'G', 5, 32)
 	processorProcessorArchitecture := string(processor.ProcessorArchitecture)
-	processorSerialNumber := processor.Oem.Public.SerialNumber
+
+	processorMaxSpeedMHz := fmt.Sprintf("%vMhz", processor.MaxSpeedMHz)
+
+	var processorSerialNumber string
+	if processor.Oem.H3C.SerialNumber != "" {
+		processorSerialNumber = processor.Oem.H3C.SerialNumber
+	} else if processor.Oem.Huawei.SerialNumber != "" {
+		processorSerialNumber = processor.Oem.Huawei.SerialNumber
+	} else {
+		processorSerialNumber = processor.Oem.Public.SerialNumber
+	}
+
 	systemProcessorLabelValues := []string{assetTag, serialNumber, processorID, processorManufacturer, processorModel, processorSerialNumber, processorMaxSpeedMHz, processorProcessorArchitecture, "Processor"}
 
 	if processorStateValue, ok := parseCommonStatusState(processorState); ok {
@@ -404,7 +414,7 @@ func parsePorcessor(ch chan<- prometheus.Metric, assetTag string, serialNumber s
 	ch <- prometheus.MustNewConstMetric(systemMetrics["system_processor_total_cores"].desc, prometheus.GaugeValue, float64(processorTotalCores), systemProcessorLabelValues...)
 }
 
-func parseMemory(ch chan<- prometheus.Metric, assetTag string, serialNumber string, memory *redfish2.Memory, wg *sync.WaitGroup) {
+func parseMemory(ch chan<- prometheus.Metric, assetTag string, serialNumber string, memory *redfish.Memory, wg *sync.WaitGroup) {
 	defer wg.Done()
 	memoryName := memory.Name
 	memoryID := memory.ID
@@ -425,7 +435,7 @@ func parseMemory(ch chan<- prometheus.Metric, assetTag string, serialNumber stri
 
 }
 
-func parseStorageController(ch chan<- prometheus.Metric, assetTag string, serialNumber string, storageController *redfish2.StorageController, wg *sync.WaitGroup) {
+func parseStorageController(ch chan<- prometheus.Metric, assetTag string, serialNumber string, storageController *redfish.StorageController, wg *sync.WaitGroup) {
 	defer wg.Done()
 	storageControllerUID := storageController.SerialNumber
 	storageControllerFirmwareVersion := storageController.FirmwareVersion
@@ -442,7 +452,7 @@ func parseStorageController(ch chan<- prometheus.Metric, assetTag string, serial
 
 }
 
-func parseDrive(ch chan<- prometheus.Metric, assetTag string, serialNumber string, drive *redfish2.Drive, wg *sync.WaitGroup) {
+func parseDrive(ch chan<- prometheus.Metric, assetTag string, serialNumber string, drive *redfish.Drive, wg *sync.WaitGroup) {
 	defer wg.Done()
 	driveName := drive.Name
 	driveUID := drive.SerialNumber
@@ -462,7 +472,7 @@ func parseDrive(ch chan<- prometheus.Metric, assetTag string, serialNumber strin
 	ch <- prometheus.MustNewConstMetric(systemMetrics["system_storage_drive_capacity"].desc, prometheus.GaugeValue, float64(driveCapacityBytes), storageDriveLabelValues...)
 }
 
-func parseVolume(ch chan<- prometheus.Metric, assetTag string, serialNumber string, volume *redfish2.Volume, wg *sync.WaitGroup) {
+func parseVolume(ch chan<- prometheus.Metric, assetTag string, serialNumber string, volume *redfish.Volume, wg *sync.WaitGroup) {
 	defer wg.Done()
 	volumeName := volume.Name
 	volumeID := volume.ID

@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"hardware_exporter/lib/gofish"
 	gofishcommon "hardware_exporter/lib/gofish/common"
-	redfish2 "hardware_exporter/lib/gofish/redfish"
-	hosts2 "hardware_exporter/lib/hosts"
+	redfish "hardware_exporter/lib/gofish/redfish"
+	hosts "hardware_exporter/lib/hosts"
 	"net"
 	_ "net/http/pprof"
 	"os"
@@ -49,7 +49,7 @@ type RedfishCollector struct {
 // NewRedfishCollector return RedfishCollector
 func NewRedfishCollector(hostsConfigPath string, logger log.Logger) *RedfishCollector {
 	var collectors map[string]prometheus.Collector
-	serversInfo := hosts2.ReadConfigIni(hostsConfigPath, logger)
+	serversInfo := hosts.ReadConfigIni(hostsConfigPath, logger)
 	redfishClient, err := generateConfigIniRedfishClient(serversInfo, logger)
 	if err != nil {
 		level.Error(logger).Log("err", err)
@@ -111,7 +111,7 @@ func (r *RedfishCollector) Collect(ch chan<- prometheus.Metric) {
 	ch <- prometheus.MustNewConstMetric(totalScrapeDurationDesc, prometheus.GaugeValue, time.Since(scrapeTime).Seconds())
 }
 
-func generateConfigIniRedfishClient(serverInfo *hosts2.ServerMap, logger log.Logger) (*gofish.APIClient, error) {
+func generateConfigIniRedfishClient(serverInfo *hosts.ServerMap, logger log.Logger) (*gofish.APIClient, error) {
 	hostname, err := os.Hostname()
 	if err != nil {
 		return nil, errors.New("hostname error I can't generate redfish client, Please check your hosts file!")
@@ -200,7 +200,7 @@ func parseCommonStatusState(status gofishcommon.State) (float64, bool) {
 	return float64(0), false
 }
 
-func parseCommonPowerState(status redfish2.PowerState) (float64, bool) {
+func parseCommonPowerState(status redfish.PowerState) (float64, bool) {
 	if bytes.Equal([]byte(status), []byte("On")) {
 		return float64(1), true
 	} else if bytes.Equal([]byte(status), []byte("Off")) {
@@ -213,7 +213,7 @@ func parseCommonPowerState(status redfish2.PowerState) (float64, bool) {
 	return float64(0), false
 }
 
-func parseLinkStatus(status redfish2.LinkStatus) (float64, bool) {
+func parseLinkStatus(status redfish.LinkStatus) (float64, bool) {
 	if bytes.Equal([]byte(status), []byte("LinkUp")) {
 		return float64(1), true
 	} else if bytes.Equal([]byte(status), []byte("NoLink")) {
@@ -224,7 +224,7 @@ func parseLinkStatus(status redfish2.LinkStatus) (float64, bool) {
 	return float64(0), false
 }
 
-func parseZteLinkStatus(status redfish2.LinkStatus) (float64, bool) {
+func parseZteLinkStatus(status redfish.LinkStatus) (float64, bool) {
 	if bytes.Equal([]byte(status), []byte("Up")) {
 		return float64(1), true
 	} else if bytes.Equal([]byte(status), []byte("No")) {

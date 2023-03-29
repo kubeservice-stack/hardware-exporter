@@ -807,11 +807,6 @@ func (computersystem *ComputerSystem) Storage() ([]*Storage, error) {
 	return ListReferencedStorages(computersystem.Client, computersystem.storage)
 }
 
-// Storage gets the storage associated with this system.
-func (computersystem *ComputerSystem) ZteStorage() ([]*ZteStorage, error) {
-	return ListReferencedZteStorages(computersystem.Client, computersystem.storages)
-}
-
 // CSLinks are references to resources that are related to, but not contained
 // by (subordinate to), this resource.
 type CSLinks struct {

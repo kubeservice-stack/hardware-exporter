@@ -1,7 +1,6 @@
 # Build the manager binary
-FROM golang:1.19 as builder
+FROM golang:alpine as builder
 LABEL maintainer="The Prometheus Authors <shenwei@cmss.chinamobile.com>"
-RUN apt-get -y update
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -11,9 +10,7 @@ COPY go.sum go.sum
 # Copy the go source
 COPY hardware_exporter.go hardware_exporter.go
 COPY collector/ collector/
-COPY lib/config/ config/
-COPY lib/gofish/ gofish/
-COPY lib/hosts/ hosts/
+COPY lib/       lib/
 COPY config.ini config.ini
 # Build
 ENV CGO_ENABLED=0
