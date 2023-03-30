@@ -3,11 +3,7 @@ package collector
 import (
 	"fmt"
 	"hardware_exporter/lib/gofish"
-<<<<<<< HEAD
 	redfish "hardware_exporter/lib/gofish/redfish"
-=======
-	redfish2 "hardware_exporter/lib/gofish/redfish"
->>>>>>> 8b7c0e14adc9a44a469bc0583a819bc693d4f371
 	"strings"
 	"sync"
 
@@ -421,11 +417,6 @@ func parseNetworkPorts(ch chan<- prometheus.Metric, assetTag string, serialNumbe
 	} else if networkPort.Oem.H3c.PortType != "" {
 		networkPortType = fmt.Sprintf("%v", networkPort.Oem.H3c.PortType)
 	}
-<<<<<<< HEAD
-
-=======
-	
->>>>>>> 8b7c0e14adc9a44a469bc0583a819bc693d4f371
 	networkPortLabelValues := []string{assetTag, serialNumber, netAdapter_id, networkPortID, networkPortMac, networkPortSpeed, networkPortType, "EthInterface"}
 	if networkPortLinkStatusValue, ok := parseZteLinkStatus(redfish.LinkStatus(networkPortLinkStatus)); ok {
 		ch <- prometheus.MustNewConstMetric(chassisMetrics["network_port_linkStatus"].desc, prometheus.GaugeValue, networkPortLinkStatusValue, networkPortLabelValues...)

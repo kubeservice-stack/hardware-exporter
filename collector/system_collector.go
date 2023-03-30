@@ -3,11 +3,7 @@ package collector
 import (
 	"fmt"
 	"hardware_exporter/lib/gofish"
-<<<<<<< HEAD
 	redfish "hardware_exporter/lib/gofish/redfish"
-=======
-	redfish2 "hardware_exporter/lib/gofish/redfish"
->>>>>>> 8b7c0e14adc9a44a469bc0583a819bc693d4f371
 	"strings"
 	"sync"
 
