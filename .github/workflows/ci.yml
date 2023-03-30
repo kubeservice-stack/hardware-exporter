@@ -14,7 +14,6 @@ on:
     branches: [ "master" ]
 
 env:
-  # github.repository as <account>/<repo>
   IMAGE_NAME: matthewshen/hardware-exporter
 
 jobs:
